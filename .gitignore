@@ -1,0 +1,50 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environnements virtuels Python
+.venv/
+venv/
+env/
+ENV/
+
+# Variables d'environnement et secrets
+.env
+.env.*
+!.env.example
+
+# Tests et couverture
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+
+# Outils de qualité et typage
+.mypy_cache/
+.ruff_cache/
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+
+# Fichiers générés par Python
+*.egg-info/
+dist/
+build/
+
+# Éditeurs
+.vscode/
+.idea/
+
+# Système d'exploitation
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Modèles et fichiers temporaires
+*.pkl
+*.joblib
+*.tmp
