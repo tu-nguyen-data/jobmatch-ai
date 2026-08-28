@@ -1,5 +1,6 @@
-from fastapi import FastAPI
-from app.schemas.offer import Offer
+from fastapi import FastAPI, HTTPException
+
+from app.schemas.offer import Offer, OfferCreate
 
 app = FastAPI(
     title="JobMatch AI API",
@@ -24,8 +25,14 @@ def health_check() -> dict[str, str]:
     return {"status": "ok"}
 
 @app.post("/offers")
-def create_offer(offer: Offer) -> Offer:
+def create_offer(offer_data: OfferCreate) -> Offer:
+    offer = Offer(
+        id=len(offers) + 1,
+        **offer_data.model_dump(),
+    )
+
     offers.append(offer)
+
     return offer
 
 def create_offer(offer: Offer) -> Offer:
@@ -35,3 +42,14 @@ def create_offer(offer: Offer) -> Offer:
 @app.get("/offers")
 def get_offers() -> list[Offer]:
     return offers
+
+@app.get("/offers/{offer_id}")
+def get_offer(offer_id: int) -> Offer:
+    for offer in offers:
+        if offer.id == offer_id:
+            return offer
+
+    raise HTTPException(
+        status_code=404,
+        detail="Offre introuvable",
+    )
