@@ -75,3 +75,45 @@ def get_offer(
         )
 
     return offer
+
+@app.delete("/offers/{offer_id}")
+def delete_offer(
+    offer_id: int,
+    db: Session = Depends(get_db),
+) -> dict[str, str]:
+    offer = db.get(OfferModel, offer_id)
+
+    if offer is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Offre introuvable",
+        )
+
+    db.delete(offer)
+    db.commit()
+
+    return {"message": "Offre supprimée"}
+
+@app.put("/offers/{offer_id}")
+def update_offer(
+    offer_id: int,
+    offer_data: OfferCreate,
+    db: Session = Depends(get_db),
+) -> Offer:
+    offer = db.get(OfferModel, offer_id)
+
+    if offer is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Offre introuvable",
+        )
+
+    offer.title = offer_data.title
+    offer.company = offer_data.company
+    offer.location = offer_data.location
+    offer.description = offer_data.description
+
+    db.commit()
+    db.refresh(offer)
+
+    return offer
