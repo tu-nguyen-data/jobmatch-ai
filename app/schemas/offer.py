@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class OfferCreate(BaseModel):
@@ -10,3 +10,5 @@ class OfferCreate(BaseModel):
 
 class Offer(OfferCreate):
     id: int
+
+    model_config = ConfigDict(from_attributes=True)
