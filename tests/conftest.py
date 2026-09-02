@@ -1,5 +1,5 @@
 import pytest
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 from app.models.offer import Offer as OfferModel
 
@@ -36,15 +36,20 @@ app.dependency_overrides[get_db] = override_get_db
 
 @pytest.fixture(scope="session", autouse=True)
 def setup_test_database():
-    # Nettoie le schéma de test avant les tests.
-    Base.metadata.drop_all(bind=test_engine)
+    with test_engine.connect() as connection:
+        connection.execute(
+            text(
+                "CREATE SCHEMA IF NOT EXISTS "
+                "jobmatch_test AUTHORIZATION jobmatch_user"
+            )
+        )
+        connection.commit()
 
-    # Crée les tables dans jobmatch_test.
+    Base.metadata.drop_all(bind=test_engine)
     Base.metadata.create_all(bind=test_engine)
 
     yield
 
-    # Nettoie après la session de tests.
     Base.metadata.drop_all(bind=test_engine)
 
 @pytest.fixture(autouse=True)
