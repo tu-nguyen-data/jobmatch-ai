@@ -67,3 +67,64 @@ def test_create_and_get_offer():
     assert data["id"] == offer_id
     assert data["title"] == "Data Engineer Alternance"
     assert data["company"] == "Capgemini"
+
+def test_update_offer():
+    create_response = client.post(
+        "/offers",
+        json={
+            "title": "Data Analyst Alternance",
+            "company": "Airbus",
+            "location": "Toulouse",
+            "description": "Python, SQL et Power BI",
+        },
+    )
+
+    offer_id = create_response.json()["id"]
+
+    update_response = client.put(
+        f"/offers/{offer_id}",
+        json={
+            "title": "Data Analyst Alternance - Updated",
+            "company": "Airbus",
+            "location": "Toulouse",
+            "description": "Python, SQL, Power BI et machine learning",
+        },
+    )
+
+    assert update_response.status_code == 200
+
+    data = update_response.json()
+
+    assert data["id"] == offer_id
+    assert data["title"] == "Data Analyst Alternance - Updated"
+    assert data["description"] == (
+        "Python, SQL, Power BI et machine learning"
+    )
+
+
+def test_delete_offer():
+    create_response = client.post(
+        "/offers",
+        json={
+            "title": "BI Analyst Alternance",
+            "company": "Sopra Steria",
+            "location": "Toulouse",
+            "description": "Power BI, SQL, Excel et reporting",
+        },
+    )
+
+    offer_id = create_response.json()["id"]
+
+    delete_response = client.delete(f"/offers/{offer_id}")
+
+    assert delete_response.status_code == 200
+    assert delete_response.json() == {
+        "message": "Offre supprimée"
+    }
+
+    get_response = client.get(f"/offers/{offer_id}")
+
+    assert get_response.status_code == 404
+    assert get_response.json() == {
+        "detail": "Offre introuvable"
+    }
