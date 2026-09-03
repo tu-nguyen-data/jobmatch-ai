@@ -1,5 +1,7 @@
 # JobMatch AI
 
+[![CI](https://github.com/tu-nguyen-data/jobmatch-ai/actions/workflows/ci.yml/badge.svg)](https://github.com/tu-nguyen-data/jobmatch-ai/actions/workflows/ci.yml)
+
 Application permettant d'analyser un profil candidat et de recommander des offres d'alternance pertinentes.
 
 ## Objectif
