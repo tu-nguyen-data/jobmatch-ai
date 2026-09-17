@@ -9,6 +9,8 @@ from app.models.offer import Offer as OfferModel
 from app.schemas.offer import Offer, OfferCreate
 from app.services.offer_import import import_offers_dataframe
 
+from app.schemas.matching import MatchRequest, MatchResult
+from app.services.matching import calculate_match_scores
 def get_db():
     db = SessionLocal()
 
@@ -159,3 +161,43 @@ async def import_offers_csv(
         )
 
     return import_offers_dataframe(df, db)
+
+@app.post("/match", response_model=list[MatchResult])
+def match_offers(
+    request: MatchRequest,
+    db: Session = Depends(get_db),
+) -> list[MatchResult]:
+    offers = db.query(OfferModel).all()
+
+    offer_texts = [
+        (
+            f"{offer.title} "
+            f"{offer.company} "
+            f"{offer.location} "
+            f"{offer.description}"
+        )
+        for offer in offers
+    ]
+
+    scores = calculate_match_scores(
+        request.candidate_text,
+        offer_texts,
+    )
+
+    results = [
+        MatchResult(
+            offer_id=offer.id,
+            title=offer.title,
+            company=offer.company,
+            location=offer.location,
+            score=score,
+        )
+        for offer, score in zip(offers, scores)
+    ]
+
+    results.sort(
+        key=lambda result: result.score,
+        reverse=True,
+    )
+
+    return results

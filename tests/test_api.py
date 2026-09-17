@@ -128,3 +128,39 @@ def test_delete_offer():
     assert get_response.json() == {
         "detail": "Offre introuvable"
     }
+
+def test_match_offers_ranks_related_offer_first():
+    client.post(
+        "/offers",
+        json={
+            "title": "Data Analyst Alternance",
+            "company": "Airbus",
+            "location": "Toulouse",
+            "description": "Python SQL Power BI data analysis",
+        },
+    )
+
+    client.post(
+        "/offers",
+        json={
+            "title": "Java Developer",
+            "company": "Example Tech",
+            "location": "Toulouse",
+            "description": "Java Spring Boot microservices backend",
+        },
+    )
+
+    response = client.post(
+        "/match",
+        json={
+            "candidate_text": "Python SQL Power BI data analysis"
+        },
+    )
+
+    assert response.status_code == 200
+
+    results = response.json()
+
+    assert len(results) == 2
+    assert results[0]["title"] == "Data Analyst Alternance"
+    assert results[0]["score"] > results[1]["score"]
